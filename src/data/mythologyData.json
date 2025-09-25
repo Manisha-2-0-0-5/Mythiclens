@@ -1,0 +1,23 @@
+{
+  "vase": {
+    "description": "In Greek mythology, vases often symbolize offerings to gods or are associated with Pandora's box, which unleashed evils but retained hope."
+  },
+  "trident": {
+    "description": "The trident is a symbol of Poseidon, Greek god of the sea, used to control storms and earthquakes."
+  },
+  "lyre": {
+    "description": "The lyre, linked to Apollo, god of music and prophecy, represents harmony and artistic expression in Greek mythology."
+  },
+  "helmet": {
+    "description": "The helmet, associated with Hades, grants invisibility and symbolizes his rule over the underworld."
+  },
+  "shield": {
+    "description": "The shield, tied to Athena, goddess of wisdom, represents protection and strategic warfare in Greek mythology."
+  },
+  "olive branch": {
+    "description": "The olive branch, a gift from Athena to Athens, symbolizes peace, victory, and the city's prosperity."
+  },
+  "bow and arrow": {
+    "description": "The bow and arrow, wielded by Artemis, goddess of the hunt and moon, signify precision and independence."
+  }
+}
