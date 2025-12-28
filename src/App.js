@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+// ✅ Import useLocation to track navigation changes
 import { BrowserRouter as Router, Route, Routes, Link, Navigate, useLocation } from 'react-router-dom';
 import ImageUpload from './components/ImageUpload';
 import ResultCard from './components/ResultCard';
@@ -9,6 +10,8 @@ import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import Profile from './components/Profile';
 import MythLibrary from './components/MythLibrary';
+
+// Best Practice: This hook could be moved to its own file, e.g., 'src/hooks/useAuth.js'
 const useAuthPersistence = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -41,6 +44,8 @@ const useAuthPersistence = () => {
 
   return { isAuthenticated, currentUser, isLoading, login, logout };
 };
+
+// Best Practice: This component could be moved to its own file, e.g., 'src/components/Navigation.js'
 const Navigation = ({ isAuthenticated, currentUser, onLogout }) => {
   const location = useLocation();
   
@@ -53,6 +58,7 @@ const Navigation = ({ isAuthenticated, currentUser, onLogout }) => {
       : 'hover:bg-white hover:bg-opacity-10 hover:text-yellow-300'
     }
   `;
+
   return (
     <nav className="bg-gradient-to-r from-blue-700 via-purple-700 to-indigo-700 text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4">
@@ -74,7 +80,8 @@ const Navigation = ({ isAuthenticated, currentUser, onLogout }) => {
                 <Link to="/upload" className={linkClasses('/upload')}>Upload</Link>
                 <Link to="/myth-library" className={linkClasses('/myth-library')}>Myth Library</Link>
                 <Link to="/user-engagement" className={linkClasses('/user-engagement')}>Analytics</Link>
-                <Link to="/profile" className={linkClasses('/profile')}>Profile</Link> 
+                <Link to="/profile" className={linkClasses('/profile')}>Profile</Link>
+                
                 <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-white border-opacity-30">
                   <span className="text-sm text-yellow-200">
                     Welcome, {currentUser?.email?.split('@')[0]}
@@ -94,25 +101,32 @@ const Navigation = ({ isAuthenticated, currentUser, onLogout }) => {
     </nav>
   );
 };
+
+// Best Practice: This component could be moved to its own file, e.g., 'src/components/ProtectedRoute.js'
 const ProtectedRoute = ({ children, isAuthenticated }) => {
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
+
+// A small component to handle clearing errors on navigation
 const ErrorClearer = ({ clearError }) => {
   const location = useLocation();
   useEffect(() => {
     clearError();
   }, [location.pathname, clearError]);
-  return null; 
+  return null; // This component doesn't render anything
 };
+
 function App() {
   const { isAuthenticated, currentUser, isLoading, login, logout } = useAuthPersistence();
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
   const [users, setUsers] = useState(() => {
     const savedUsers = localStorage.getItem('users');
     return savedUsers ? JSON.parse(savedUsers) : [];
   });
+  
   const [uploadHistory, setUploadHistory] = useState(() => {
     const savedHistory = localStorage.getItem('uploadHistory');
     return savedHistory ? JSON.parse(savedHistory) : [];
@@ -143,6 +157,7 @@ function App() {
       throw err;
     }
   };
+
   const handleRegister = async (email, password, confirmPassword) => {
     try {
       const trimmedEmail = email.toLowerCase().trim();
@@ -150,6 +165,7 @@ function App() {
       if (password !== confirmPassword) throw new Error('Passwords do not match.');
       if (password.length < 6) throw new Error('Password must be at least 6 characters long.');
       if (users.some(u => u.email === trimmedEmail)) throw new Error('This email is already registered.');
+
       const newUser = { 
         email: trimmedEmail, 
         password, 
@@ -163,11 +179,13 @@ function App() {
       throw err;
     }
   };
+
   const handleLogout = () => {
     logout();
     setResult(null);
     setError('');
   };
+
   const addToUploadHistory = (objectName) => {
     const newEntry = {
       objectName,
@@ -176,6 +194,7 @@ function App() {
     };
     setUploadHistory(prev => [...prev, newEntry]);
   };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
@@ -183,6 +202,7 @@ function App() {
       </div>
     );
   }
+
   return (
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
@@ -191,6 +211,7 @@ function App() {
           currentUser={currentUser}
           onLogout={handleLogout} 
         />
+        {/* ✅ This component now handles clearing errors on route change */}
         <ErrorClearer clearError={() => setError('')} />
 
         {error && (
@@ -225,11 +246,14 @@ function App() {
             }/>
             <Route path="/profile" element={
               <ProtectedRoute isAuthenticated={isAuthenticated}>
+                {/* ✅ FIX: Pass the 'userEmail' prop correctly */}
                 <Profile userEmail={currentUser?.email} />
               </ProtectedRoute>
             }/>
             <Route path="/myth-library" element={<ProtectedRoute isAuthenticated={isAuthenticated}><MythLibrary /></ProtectedRoute>} />
             <Route path="/user-engagement" element={<ProtectedRoute isAuthenticated={isAuthenticated}><EngagementChart uploadHistory={uploadHistory} currentUser={currentUser} /></ProtectedRoute>} />
+
+            {/* Default redirect & 404 handler */}
             <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
             <Route path="*" element={
               <div className="text-center py-12">
@@ -243,4 +267,5 @@ function App() {
     </Router>
   );
 }
+
 export default App;
